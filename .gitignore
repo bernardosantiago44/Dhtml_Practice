@@ -1,0 +1,53 @@
+## .NET Core
+bin/
+obj/
+out/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# ASP.NET Core
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.db
+*.sqlite
+*.pdb
+
+# Visual Studio Code
+.vscode/
+
+# Rider
+.idea/
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.dll
+*.exe
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+*.nuspec
+*.psmdcp
+
+# Logs
+*.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# DHTMLX Framework files (assuming you manage them separately)
+wwwroot/codebase/
+
+# Optional: if you have any config files you don't want to track
+# e.g. for local dev secrets or environment-specific values
+appsettings.Development.json
+secrets.json
