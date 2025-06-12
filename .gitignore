@@ -46,6 +46,7 @@ Thumbs.db
 
 # DHTMLX Framework files (assuming you manage them separately)
 wwwroot/codebase/
+wwwroot/
 
 # Optional: if you have any config files you don't want to track
 # e.g. for local dev secrets or environment-specific values
