@@ -1,0 +1,41 @@
+﻿@model IEnumerable<Dhtmlx_Practice.Models.Product>
+@using System.Text.Json;
+
+@{
+    ViewData["Title"] = "Products";
+
+    var jsonData = JsonSerializer.Serialize(
+        Model.Select(product => new
+        {
+            id = product.Id,
+            description = product.Description,
+            price = product.Price
+        }),
+        new JsonSerializerOptions { PropertyNamingPolicy = null }
+    );
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<div id="grid_container" style="width: 100%; height: 400px; background: #f4f4f4;"></div>
+<pre>@jsonData</pre>
+
+@section Scripts {
+    <script>
+
+        const grid = new dhx.Grid("grid_container", {
+            columns: [
+                { id: "id", header: [{ text: "ID" }], width: 80 },
+                { id: "description", header: [{ text: "Description" }] },
+                { id: "price", header: [{ text: "Price" }], type: "number" }
+            ],
+            autoWidth: true,
+            height: 400
+        });
+
+        const data = @Html.Raw(jsonData);
+        console.log("Parsed data:", data);
+        grid.data.parse(data);
+        
+    </script>
+}

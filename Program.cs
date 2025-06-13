@@ -42,6 +42,9 @@ namespace Dhtmlx_Practice
             app.MapStaticAssets();
             app.MapRazorPages()
                .WithStaticAssets();
+            app.MapControllerRoute(
+                name: "default",
+                pattern: "{controller=Product}/{action=Index}/{id?}");
 
             app.Run();
         }
