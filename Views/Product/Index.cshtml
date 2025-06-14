@@ -3,6 +3,8 @@
 
 @{
     ViewData["Title"] = "Products";
+    var currentPage = ViewBag.CurrentPage as int? ?? 1;
+    var totalPages = ViewBag.TotalPages as int? ?? 1;
 
     var jsonData = JsonSerializer.Serialize(
         Model.Select(product => new
@@ -18,24 +20,47 @@
 <h1>@ViewData["Title"]</h1>
 
 <div id="grid_container" style="width: 100%; height: 400px; background: #f4f4f4;"></div>
-<pre>@jsonData</pre>
+
+<nav>
+    <ul class="pagination">
+        @for (int i = 1; i <= totalPages; i++)
+        {
+            <li class="page-item @(i == currentPage ? "active" : "")">
+                <a class="page-link" href="/Product/Index?page=@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>
+
+
 
 @section Scripts {
     <script>
-
-        const grid = new dhx.Grid("grid_container", {
-            columns: [
-                { id: "id", header: [{ text: "ID" }], width: 80 },
-                { id: "description", header: [{ text: "Description" }] },
-                { id: "price", header: [{ text: "Price" }], type: "number" }
-            ],
-            autoWidth: true,
-            height: 400
+        var grid;
+        document.addEventListener('DOMContentLoaded', function() { 
+            constructGrid();
+            loadDataToGrid();
         });
 
-        const data = @Html.Raw(jsonData);
-        console.log("Parsed data:", data);
-        grid.data.parse(data);
+        function constructGrid() {
+            grid = new dhtmlXGridObject("grid_container");
+            grid.setHeader("ID,Description,Price");
+            grid.setInitWidths("100,300,100,100");
+            grid.setColAlign("center,left,center,center,center");
+            grid.setColTypes("ro,ro,ro,ro,ro");
+            grid.setColSorting("int,str,float,int,str");
+
+            grid.init();
+        }
+
+        function loadDataToGrid() {
+            var data = @Html.Raw(Json.Serialize(Model));
+
+            grid.clearAll();
+            data.forEach(product => {
+                grid.addRow(product.id, [product.id, product.description, product.price]);
+            });
+        }
         
     </script>
 }

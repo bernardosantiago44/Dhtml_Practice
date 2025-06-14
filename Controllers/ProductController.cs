@@ -33,17 +33,27 @@ namespace Dhtmlx_Practice.Controllers
             _connectionString = connection;
         }
 
-        public async Task<IActionResult> Index(int page = 1)
+        public async Task<IActionResult> Index(int page = 1, int pageSize = 5)
         {
-            var products = new List<Product>();
-            const int productsPerPage = 5;
-            int totalRecords = 0;
+            var products = await GetPagedProductAsync(page, pageSize);
+            int totalRecords = await GetTotalProductCountAsync();
+
+            int totalPages = (int)Math.Ceiling(totalRecords / (double)pageSize);
+
+            ViewBag.CurrentPage = page;
+            ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / pageSize);
+            ViewBag.HasPreviousPage = page > 1;
+            ViewBag.HasNextPage = page < totalPages;
+
+            return View(products);
+        }
+
+        private async Task<List<Product>> GetPagedProductAsync(int page, int nextItems)
+        {
+            List<Product> products = new List<Product>();
 
             using var connection = new SqlConnection(_connectionString);
             await connection.OpenAsync();
-
-            using var countCmd = new SqlCommand("SELECT COUNT(*) FROM Products", connection);
-            totalRecords = (int)await countCmd.ExecuteScalarAsync();
 
             var query = @"
                 SELECT Id, Description, Price
@@ -51,26 +61,37 @@ namespace Dhtmlx_Practice.Controllers
                 ORDER BY Id 
                 OFFSET @Offset ROWS 
                 FETCH NEXT @PageSize ROWS ONLY;";
-
+            
             using var command = new SqlCommand(query, connection);
-            command.Parameters.Add(new SqlParameter("@Offset", (page - 1) * productsPerPage));
-            command.Parameters.Add(new SqlParameter("@PageSize", productsPerPage));
+            command.Parameters.Add(new SqlParameter("@Offset", (page - 1) * nextItems));
+            command.Parameters.Add(new SqlParameter("@PageSize", nextItems));
 
             using var reader = await command.ExecuteReaderAsync();
-            while (await reader.ReadAsync())
-            {
-                products.Add(new Product
-                {
+            while (await reader.ReadAsync()) {
+                products.Add(new Product {
                     Id = reader.GetInt32(0),
                     Description = reader.GetString(1),
                     Price = reader.GetDecimal(2)
                 });
             }
 
-            ViewBag.CurrentPage = page;
-            ViewBag.TotalPages = (int)Math.Ceiling((double)totalRecords / productsPerPage);
 
-            return View(products);
+            return products;
+        }
+
+        private async Task<int> GetTotalProductCountAsync()
+        {
+            int count = 0;
+
+            using var connection = new SqlConnection(_connectionString);
+            await connection.OpenAsync();
+
+            string query = "SELECT COUNT(*) FROM Products";
+
+            using var command = new SqlCommand(query, connection);
+            count = (int) await command.ExecuteScalarAsync();
+
+            return count;
         }
 
         [HttpPost]
