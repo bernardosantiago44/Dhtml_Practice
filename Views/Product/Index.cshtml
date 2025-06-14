@@ -1,6 +1,8 @@
 ﻿@model IEnumerable<Dhtmlx_Practice.Models.Product>
 @using System.Text.Json;
 
+<link rel="stylesheet" type="text/css" href="/Dhtmlx/skins/skyblue/dhtmlx.css" />
+
 @{
     ViewData["Title"] = "Products";
     var currentPage = ViewBag.CurrentPage as int? ?? 1;
@@ -19,7 +21,7 @@
 
 <h1>@ViewData["Title"]</h1>
 
-<div id="grid_container" style="width: 100%; height: 400px; background: #f4f4f4;"></div>
+<div id="grid_container" style="width: 70%; height: 400px; background: #f4f4f4;"></div>
 
 <nav>
     <ul class="pagination">
@@ -44,8 +46,9 @@
 
         function constructGrid() {
             grid = new dhtmlXGridObject("grid_container");
+            grid.setImagePath("/Dhtmlx/skins/skyblue/imgs/dhxgrid_skyblue/");
             grid.setHeader("ID,Description,Price");
-            grid.setInitWidths("100,300,100,100");
+            grid.setInitWidths("100,*,100,100");
             grid.setColAlign("center,left,center,center,center");
             grid.setColTypes("ro,ro,ro,ro,ro");
             grid.setColSorting("int,str,float,int,str");
